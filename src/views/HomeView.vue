@@ -1,42 +1,47 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useDisplay } from 'vuetify'
-const { smAndUp } = useDisplay()
+const { mdAndUp } = useDisplay()
 const tab = ref('debit')
 </script>
 
 <template>
-  <v-layout class="h-screen pa-4">
+  <v-layout :class="mdAndUp ? '' : 'bg-primary-darken-1'" class="h-screen">
     <v-navigation-drawer
       class="bg-primary-darken-1 h-auto"
-      :location="smAndUp ? 'left' : 'bottom'"
+      :location="mdAndUp ? 'left' : 'bottom'"
       permanent
+      elevation="5"
     >
-      <h4 class="text-h4 text-secondary-darken-1 pa-4 d-none d-sm-block">aspire</h4>
-      <v-list density="compact" class="d-flex d-sm-block">
-        <v-list-item active title="Cards" active-class="text-secondary-darken-1 cursor-pointer">
+      <h4 class="text-h4 text-secondary-darken-1 pa-4 d-none d-md-block">aspire</h4>
+      <v-list density="compact" class="d-flex d-md-block" :class="mdAndUp ? '' : 'pa-0'">
+        <v-list-item active title="Cards" prepend-icon="mdi-credit-card" active-class="text-secondary-darken-1 cursor-pointer">
         </v-list-item>
       </v-list>
     </v-navigation-drawer>
 
-    <v-main>
-      <v-row justify="space-between mb-6">
+    <v-main class="main-container">
+      <v-row justify="space-between" class="mb-6">
         <v-col cols="auto">
           <p class="text-subtitle-1">Available balance</p>
           <span class="text-subtitle-2">$2000</span>
         </v-col>
         <v-col cols="auto">
           <v-btn
-            density="compact"
-            variant="flat"
             prepend-icon="mdi-plus"
             size="medium"
-            class="bg-primary pa-1"
+            :class="mdAndUp ? 'bg-primary ' : 'bg-secondary'"
+            class="pa-1"
             >New card</v-btn
           >
         </v-col>
       </v-row>
-      <v-tabs v-model="tab" color="primary" align-tabs="start" class="mb-6">
+      <v-tabs
+        v-model="tab"
+        :color="mdAndUp ? 'primary' : 'secondary'"
+        align-tabs="start"
+        class="mb-6"
+      >
         <v-tab :value="'debit'">My debit cards</v-tab>
       </v-tabs>
       <v-card class="pa-4 debit-card">
@@ -59,18 +64,8 @@ const tab = ref('debit')
               icon="mdi-credit-card-check-outline"
             ></v-icon> </v-card-text
         ></v-card>
-        <v-row>
-          <v-col>
-            <v-btn
-              density="compact"
-              variant="flat"
-              prepend-icon="mdi-delete"
-              size="medium"
-              class="text-secondary pa-1 text-caption font-weight-medium"
-              ><span class="pl-1">Delete Card</span></v-btn
-            >
-          </v-col>
-          <v-col>
+        <v-row justify="space-between">
+          <v-col class="flex-grow-0">
             <v-btn
               density="compact"
               variant="flat"
@@ -81,17 +76,31 @@ const tab = ref('debit')
               <span class="pl-1">Show card number</span></v-btn
             ></v-col
           >
+          <v-col class="flex-grow-0">
+            <v-btn
+              density="compact"
+              variant="flat"
+              prepend-icon="mdi-delete"
+              size="medium"
+              class="text-error pa-1 text-caption font-weight-medium"
+              ><span class="pl-1">Delete Card</span></v-btn
+            >
+          </v-col>
         </v-row>
       </v-card>
     </v-main>
   </v-layout>
 </template>
 <style scoped>
+.main-container {
+  padding: 30px 30px 30px calc(var(--v-layout-left) + 30px);
+}
+
 .cursor-pointer {
   cursor: pointer;
 }
 
 .debit-card {
-  width: 400px;
+  width: 360px;
 }
 </style>
