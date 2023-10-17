@@ -1,30 +1,30 @@
 <script setup lang="ts">
 import { reactive, watchEffect } from 'vue'
 import { useDisplay } from 'vuetify'
-import Card from '../components/Card.vue'
-import { getCards, deleteCard, addCard, type Card as CardType } from '../utils/requests'
-import AddCard from '@/components/AddCard.vue';
+import CardContainer from '../components/CardContainer.vue'
+import requests from '../utils/requests'
+import AddCard from '@/components/AddCard.vue'
+import { type Card } from '../utils/types'
 
 const { mdAndUp } = useDisplay()
 const state = reactive({
   currentTab: 'debit',
-  cards: [] as CardType[]
+  cards: [] as Card[]
 })
 
 const fetchCard = async () => {
-  const res = await getCards()
+  const res = await requests.getCards()
   state.cards = res.data
 }
 
 const onCardDelete = async (index: number) => {
-  const res = await deleteCard(index);
+  const res = await requests.deleteCard(index)
   state.cards = res.data
 }
 
-const onAddCard = async (card: CardType) => {
-  const res = await addCard(card);
+const onAddCard = async (card: Card) => {
+  const res = await requests.addCard(card)
   state.cards = res.data
-  console.log(state.cards);
 }
 
 watchEffect(async () => {
@@ -52,14 +52,14 @@ watchEffect(async () => {
       </v-list>
     </v-navigation-drawer>
 
-    <v-main class="main__wrapper">
+    <v-main :class="mdAndUp ? 'main__wrapper' : 'main__wrapper--mobile'">
       <v-row justify="space-between" class="mb-6">
         <v-col cols="auto">
           <p class="text-subtitle-1">Available balance</p>
           <span class="text-subtitle-2">$2000</span>
         </v-col>
         <v-col cols="auto">
-          <AddCard @add-card="onAddCard"/>
+          <AddCard @add-card="onAddCard" />
         </v-col>
       </v-row>
       <v-tabs
@@ -72,7 +72,7 @@ watchEffect(async () => {
       </v-tabs>
       <v-row>
         <v-col v-for="(card, index) in state.cards" :key="card.cardNumber" cols="auto">
-          <Card :card="card" @delete-card="onCardDelete(index)" />
+          <CardContainer :card="card" @delete-card="onCardDelete(index)" />
         </v-col>
       </v-row>
     </v-main>
@@ -81,6 +81,11 @@ watchEffect(async () => {
 <style lang="scss" scoped>
 .main__wrapper {
   padding: 30px 30px 30px calc(var(--v-layout-left) + 30px);
+  overflow: auto;
+}
+
+.main__wrapper--mobile {
+  padding: 15px 15px 15px calc(var(--v-layout-left) + 15px);
   overflow: auto;
 }
 

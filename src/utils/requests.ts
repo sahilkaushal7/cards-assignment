@@ -1,5 +1,4 @@
-// Types
-export type Card = { firstname: string, lastname: string, cardNumber: string, cvv: string, expDate: string };
+import type { Card } from "./types";
 
 // Constants
 const STORAGE_KEY = 'cards-assignment-cards';
@@ -35,7 +34,7 @@ const getCardsFromLocalStorage = () => {
 }
 
 const setCardsInLocalStorage = (cards: Card[]) => {
-    const locallyStoredCards = localStorage.setItem(STORAGE_KEY, JSON.stringify(cards))
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(cards))
 }
 
 // Mock APIs
@@ -65,7 +64,7 @@ const deleteCard = (index: number): Promise<{ data: Card[]; }> => new Promise<{ 
     })
 });
 
-export {
+export default {
     getCards,
     addCard,
     deleteCard

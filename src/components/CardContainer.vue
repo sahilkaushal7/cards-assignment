@@ -1,17 +1,23 @@
 <script setup lang="ts">
-import { ref, defineEmits, reactive } from 'vue'
+import { defineEmits, reactive } from 'vue'
 
 const props = defineProps({
   card: {
     type: Object,
-    default: {}
+    default: () => {
+      return {}
+    }
   }
 })
+
 const state = reactive({
   dialog: false,
   showCardNumber: false,
   enableCard: true
 })
+
+const cardNumber = props?.card?.cardNumber.match(/.{1,4}/g) || []
+
 const emit = defineEmits(['delete-card'])
 
 const toggleCardNumberVisibility = () => {
@@ -20,7 +26,6 @@ const toggleCardNumberVisibility = () => {
 const toggleCardVisibility = () => {
   state.enableCard = !state.enableCard
 }
-const cardNumber = props?.card?.cardNumber.match(/.{1,4}/g) || []
 
 const deleteCard = () => {
   emit('delete-card')
@@ -30,16 +35,14 @@ const deleteCard = () => {
 
 <template>
   <v-card class="pa-4 debit-card__wrapper">
-    <v-card
-      class="bg-secondary d-flex flex-column mb-2"
-      :class="state.enableCard ? '' : 'debit-card--disabled'"
-    >
+    <v-card :disabled="!state.enableCard" class="bg-secondary d-flex flex-column mb-2" rounded>
       <v-card-title class="text-white ml-auto">aspire</v-card-title>
       <v-card-text class="text-white">
         <h6 class="text-h6 mb-4">{{ card.firstname }} {{ card.lastname }}</h6>
         <p class="mb-2">
           <span
             v-for="(split, index) in cardNumber"
+            :key="index"
             :class="index < 3 ? 'pr-8' : ''"
             class="font-weight-medium"
           >
@@ -63,12 +66,12 @@ const deleteCard = () => {
       <v-col class="flex-grow-0">
         <v-btn
           variant="flat"
-          :prepend-icon="state.enableCard ? 'mdi-eye-off' : 'mdi-eye'"
+          :prepend-icon="state.enableCard ? 'mdi-lock' : 'mdi-lock-open'"
           size="medium"
           class="text-primary pa-1 text-caption font-weight-medium"
           @click="toggleCardVisibility()"
         >
-          <span class="pl-1">{{ state.enableCard ? 'Disable' : 'Enable' }}</span></v-btn
+          <span class="pl-1">{{ state.enableCard ? 'Freeze' : 'Unfreeze' }}</span></v-btn
         ></v-col
       >
       <v-col class="flex-grow-0">
@@ -79,7 +82,7 @@ const deleteCard = () => {
           class="text-primary pa-1 text-caption font-weight-medium"
           @click="toggleCardNumberVisibility()"
         >
-          <span class="pl-1">{{ state.showCardNumber ? 'Hide' : 'Show' }} card number</span></v-btn
+          <span class="pl-1">{{ state.showCardNumber ? 'Hide' : 'Show' }} card digits</span></v-btn
         ></v-col
       >
       <v-col class="flex-grow-0">
@@ -89,7 +92,7 @@ const deleteCard = () => {
           size="medium"
           class="text-error pa-1 text-caption font-weight-medium"
           @click="state.dialog = true"
-          ><span class="pl-1">Delete Card</span></v-btn
+          ><span class="pl-1">Delete</span></v-btn
         >
         <v-dialog v-model="state.dialog" width="auto">
           <v-card text="Are you sure?">
@@ -115,14 +118,9 @@ const deleteCard = () => {
 </template>
 <style lang="scss" scoped>
 .debit-card__wrapper {
-  width: 400px;
+  max-width: 360px;
+  width: 100%;
   position: relative;
-}
-
-.debit-card--disabled {
-  opacity: 0.5;
-  pointer-events: none;
-  cursor: not-allowed;
 }
 
 .debit-card__card-number--hidden {

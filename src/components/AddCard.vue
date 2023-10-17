@@ -2,6 +2,7 @@
 import { reactive, watchEffect } from 'vue'
 import { defineEmits } from 'vue'
 import { useDisplay } from 'vuetify'
+import utilMethods from '../utils/methods'
 
 const state = reactive({
   dialogOpen: false,
@@ -16,23 +17,9 @@ const state = reactive({
 })
 const { mdAndUp } = useDisplay()
 const emit = defineEmits(['add-card'])
-const getRandomNumberOfNDigits = (digit: number) => Math.random().toFixed(digit).split('.')[1]
-const getRandomNumberBetweenNumbers = (min: number, max: number) =>
-  Math.floor(Math.random() * (max - min + 1) + min)
-
-const generateCardDetails = () => {
-  state.cardNumber = `44${getRandomNumberOfNDigits(14)}`
-  state.cvv = getRandomNumberOfNDigits(3)
-  const expMonth = getRandomNumberBetweenNumbers(0, 12)
-  state.expDate = `${expMonth < 10 ? `0${expMonth}` : expMonth}/${getRandomNumberBetweenNumbers(
-    23,
-    30
-  )}`
-}
 
 const onAddCard = () => {
   const { valid, firstname, lastname, cardNumber, expDate, cvv } = state
-  console.log(valid);
   if (valid) {
     emit('add-card', {
       firstname,
@@ -43,6 +30,13 @@ const onAddCard = () => {
     })
     closeDialog()
   }
+}
+
+const generateCardDetails = () => {
+  const { cardNumber, expDate, cvv } = utilMethods.generateCardDetails()
+  state.cardNumber = cardNumber
+  state.expDate = expDate
+  state.cvv = cvv
 }
 
 watchEffect(() => {
@@ -65,7 +59,7 @@ const closeDialog = () => {
     @click="state.dialogOpen = true"
     >New card</v-btn
   >
-  <v-dialog v-model="state.dialogOpen" width="auto">
+  <v-dialog v-model="state.dialogOpen" min-width="50%" width="auto">
     <v-card title="Enter card details">
       <v-form @submit.prevent v-model="state.valid">
         <v-container>
@@ -103,7 +97,9 @@ const closeDialog = () => {
             </v-col>
             <v-col cols="auto">
               <v-card-actions>
-                <v-btn color="primary" variant="flat" type="submit" @click="onAddCard">Add Card</v-btn>
+                <v-btn color="primary" variant="flat" type="submit" @click="onAddCard"
+                  >Add Card</v-btn
+                >
               </v-card-actions>
             </v-col>
           </v-row>
